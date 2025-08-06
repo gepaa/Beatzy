@@ -1,0 +1,9 @@
+# Query: 99%
+# ContextLines: 1
+
+1 result - 1 file
+
+src/components/HomePage.tsx:
+  245                <div className="stat">
+  246:                 <span className="stat-number">94%</span>
+  247                  <span className="stat-label">Satisfaction Rate</span>
