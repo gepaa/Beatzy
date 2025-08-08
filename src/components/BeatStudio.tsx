@@ -1,16 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AudioUploader } from './AudioUploader';
-import AudioVisualizer from './AudioVisualizer';
-import BeatControls from './BeatControls';
+import Timeline from './Timeline';
+import TransportControls from './TransportControls';
 import TrackList from './TrackList';
 import AIGenerationPanel from './AIGenerationPanel';
+import EmptyStudioState from './EmptyStudioState';
+import ProjectHeader from './ProjectHeader';
 import '../styles/BeatStudio.css';
 
 interface BeatStudioProps {
   onCreateBeat?: () => void;
+  shouldCreateBeat?: boolean;
+  onBeatCreated?: () => void;
 }
 
-const BeatStudio: React.FC<BeatStudioProps> = ({ onCreateBeat }) => {
+const BeatStudio: React.FC<BeatStudioProps> = ({ onCreateBeat, shouldCreateBeat, onBeatCreated }) => {
   const [currentBeat, setCurrentBeat] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -19,6 +23,8 @@ const BeatStudio: React.FC<BeatStudioProps> = ({ onCreateBeat }) => {
   const [tempo, setTempo] = useState(120);
   const [selectedTrack, setSelectedTrack] = useState<number | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [isLooping, setIsLooping] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Mock tracks data
@@ -65,6 +71,52 @@ const BeatStudio: React.FC<BeatStudioProps> = ({ onCreateBeat }) => {
     }
   ]);
 
+  const createNewManualBeat = () => {
+    const newBeat = {
+      id: Date.now(),
+      name: 'Untitled Project',
+      duration: 240, // 4 minutes
+      tempo: 120,
+      key: 'C',
+      genre: 'Manual Creation',
+      isManual: true
+    };
+    
+    setCurrentBeat(newBeat);
+    setDuration(newBeat.duration);
+    setTempo(newBeat.tempo);
+    onBeatCreated?.();
+  };
+
+  const handleProjectNameChange = (name: string) => {
+    if (currentBeat) {
+      setCurrentBeat({ ...currentBeat, name });
+    }
+  };
+
+  const handleBpmChange = (bpm: number) => {
+    setTempo(bpm);
+    if (currentBeat) {
+      setCurrentBeat({ ...currentBeat, tempo: bpm });
+    }
+  };
+
+  const handleKeyChange = (key: string) => {
+    if (currentBeat) {
+      setCurrentBeat({ ...currentBeat, key });
+    }
+  };
+
+  const handleSave = () => {
+    console.log('Saving project:', currentBeat);
+    // TODO: Implement actual save functionality
+  };
+
+  const handleExport = () => {
+    console.log('Exporting project:', currentBeat);
+    // TODO: Implement actual export functionality
+  };
+
   const handlePlay = () => {
     setIsPlaying(!isPlaying);
     if (audioRef.current) {
@@ -73,6 +125,27 @@ const BeatStudio: React.FC<BeatStudioProps> = ({ onCreateBeat }) => {
       } else {
         audioRef.current.play();
       }
+    }
+  };
+
+  const handleStop = () => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  };
+
+  const handleRecord = () => {
+    console.log('Record functionality will be implemented later');
+    // TODO: Implement recording functionality
+  };
+
+  const handleLoop = () => {
+    setIsLooping(!isLooping);
+    if (audioRef.current) {
+      audioRef.current.loop = !isLooping;
     }
   };
 
@@ -109,6 +182,13 @@ const BeatStudio: React.FC<BeatStudioProps> = ({ onCreateBeat }) => {
     }));
   };
 
+  // Auto-create beat when shouldCreateBeat is true
+  useEffect(() => {
+    if (shouldCreateBeat && !currentBeat) {
+      createNewManualBeat();
+    }
+  }, [shouldCreateBeat, currentBeat]);
+
   useEffect(() => {
     // Mock audio time updates
     let interval: NodeJS.Timeout;
@@ -126,123 +206,95 @@ const BeatStudio: React.FC<BeatStudioProps> = ({ onCreateBeat }) => {
     return () => clearInterval(interval);
   }, [isPlaying, duration]);
 
+  // Show empty state if no current beat
+  if (!currentBeat) {
+    return <EmptyStudioState onCreateBeat={onCreateBeat || (() => {})} />;
+  }
+
   return (
     <div className="beat-studio">
-      <div className="studio-header">
-        <div className="project-info">
-          <h1 className="project-title">
-            {currentBeat ? currentBeat.name : 'New Project'}
-          </h1>
-          <div className="project-details">
-            <span className="tempo">{tempo} BPM</span>
-            {currentBeat && (
-              <>
-                <span className="key">Key: {currentBeat.key}</span>
-                <span className="genre">{currentBeat.genre}</span>
-              </>
-            )}
-          </div>
-        </div>
+      {/* Project Header */}
+      <ProjectHeader
+        projectName={currentBeat?.name || 'Untitled Project'}
+        bpm={tempo}
+        timeSignature="4/4"
+        musicalKey={currentBeat?.key || 'C'}
+        onProjectNameChange={handleProjectNameChange}
+        onBpmChange={handleBpmChange}
+        onKeyChange={handleKeyChange}
+        onSave={handleSave}
+        onExport={handleExport}
+      />
+
+      {/* Studio Actions Bar */}
+      <div className="studio-actions-bar">
+        <button
+          className="btn btn-secondary"
+          onClick={() => setShowImportModal(true)}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17,8 12,3 7,8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Import Audio
+        </button>
         
-        <div className="studio-actions">
-          <button
-            className={`btn btn-primary ${showAIPanel ? 'active' : ''}`}
-            onClick={() => setShowAIPanel(!showAIPanel)}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-              <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-              <line x1="12" y1="22.08" x2="12" y2="12"/>
-            </svg>
-            AI Assistant
-          </button>
-          
-          <button className="btn btn-secondary">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7,10 12,15 17,10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Export
-          </button>
-          
-          <button className="btn btn-accent">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7z"/>
-            </svg>
-            Save Project
-          </button>
-        </div>
+        <button
+          className={`btn btn-primary ${showAIPanel ? 'active' : ''}`}
+          onClick={() => setShowAIPanel(!showAIPanel)}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+          AI Assistant
+        </button>
       </div>
 
-      <div className="studio-workspace">
-        {/* Left Panel - Upload & AI */}
-        <div className="studio-sidebar">
-          <div className="upload-section">
-            <h3 className="section-title">Create New Beat</h3>
-            <div className="create-beat-prompt">
-              <div className="prompt-icon">🎵</div>
-              <p className="prompt-description">
-                Ready to create your next hit? Click the button below to get started.
-              </p>
-              <button className="btn btn-primary btn-lg" onClick={onCreateBeat}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                  <path d="M2 17l10 5 10-5"/>
-                  <path d="M2 12l10 5 10-5"/>
-                </svg>
-                Create Beat
-              </button>
-            </div>
-
-            <h3 className="section-title">Or Import Audio</h3>
-            <AudioUploader
-              onUpload={handleUpload}
-              maxFiles={1}
-              maxFileSize={100 * 1024 * 1024} // 100MB
-              accept={['audio/mp3', 'audio/wav', 'audio/aac', 'audio/ogg', 'audio/flac']}
-              showProgress={true}
-              showMetadata={true}
-              multiple={false}
-            />
-          </div>
-
-          {showAIPanel && (
+      <div className={`studio-workspace ${showAIPanel ? 'has-sidebar' : ''}`}>
+        {/* Left Panel - AI Panel (only when active) */}
+        {showAIPanel && (
+          <div className="studio-sidebar">
             <AIGenerationPanel
               currentBeat={currentBeat}
               onGenerate={(params) => console.log('Generate with:', params)}
               onClose={() => setShowAIPanel(false)}
             />
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Center Panel - Visualizer & Controls */}
+        {/* Main Panel - Timeline & Controls */}
         <div className="studio-main">
-          <div className="visualizer-section">
-            <AudioVisualizer
+          <div className="timeline-section">
+            <Timeline
               isPlaying={isPlaying}
               currentTime={currentTime}
               duration={duration}
-              audioData={currentBeat}
+              tempo={tempo}
+              onTimeChange={setCurrentTime}
             />
           </div>
 
-          <div className="controls-section">
-            <BeatControls
+          <div className="transport-section">
+            <TransportControls
               isPlaying={isPlaying}
               currentTime={currentTime}
               duration={duration}
               volume={volume}
-              tempo={tempo}
+              isLooping={isLooping}
               onPlay={handlePlay}
-              onTimeChange={setCurrentTime}
+              onStop={handleStop}
+              onRecord={handleRecord}
+              onLoop={handleLoop}
               onVolumeChange={setVolume}
-              onTempoChange={setTempo}
+              onTimeChange={setCurrentTime}
             />
           </div>
         </div>
 
-        {/* Right Panel - Track List */}
+        {/* Right Panel - Track List (only when beat is loaded) */}
         <div className="studio-tracks">
           <TrackList
             tracks={tracks}
@@ -257,13 +309,37 @@ const BeatStudio: React.FC<BeatStudioProps> = ({ onCreateBeat }) => {
       {/* Hidden audio element for demo */}
       <audio ref={audioRef} style={{ display: 'none' }} />
       
-      {/* Floating Action Button */}
-      <button className="fab">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </button>
+      {/* Import Audio Modal */}
+      {showImportModal && (
+        <div className="modal-overlay" onClick={() => setShowImportModal(false)}>
+          <div className="modal-content import-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">Import Audio</h3>
+              <button className="modal-close" onClick={() => setShowImportModal(false)}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+            <div className="modal-body">
+              <AudioUploader
+                onUpload={async (files) => {
+                  const result = await handleUpload(files);
+                  setShowImportModal(false);
+                  return result;
+                }}
+                maxFiles={1}
+                maxFileSize={100 * 1024 * 1024} // 100MB
+                accept={['audio/mp3', 'audio/wav', 'audio/aac', 'audio/ogg', 'audio/flac']}
+                showProgress={true}
+                showMetadata={true}
+                multiple={false}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

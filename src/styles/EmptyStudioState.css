@@ -1,0 +1,304 @@
+/* Empty Studio State Styles */
+.empty-studio-state {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: var(--spacing-xl);
+  z-index: 10;
+}
+
+.empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+  text-align: center;
+  z-index: 2;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Music Note Icon with Animation */
+.music-note-container {
+  position: relative;
+  margin-bottom: var(--spacing-lg);
+}
+
+.music-note-icon {
+  color: var(--primary);
+  opacity: 0.9;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
+}
+
+.music-waves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.wave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  animation: ripple 2s ease-out infinite;
+}
+
+.wave-2 {
+  animation-delay: 0.7s;
+  border-color: var(--secondary);
+}
+
+.wave-3 {
+  animation-delay: 1.4s;
+  border-color: var(--primary);
+}
+
+/* Text Content */
+.empty-state-text {
+  margin-bottom: var(--spacing-lg);
+}
+
+.empty-state-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, var(--text-primary), var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.empty-state-description {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Create Button */
+.empty-state-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: none;
+  border-radius: var(--border-radius-lg);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-medium);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.empty-state-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.4);
+}
+
+.empty-state-btn:active {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.empty-state-btn:hover .btn-glow {
+  transform: translateX(100%);
+}
+
+/* Help Text */
+.help-text {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-top: var(--spacing-md);
+}
+
+.help-icon {
+  font-size: 1.2rem;
+  animation: sparkle 2s ease-in-out infinite alternate;
+}
+
+/* Background Effects */
+.empty-state-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: -5;
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.2;
+  animation: float-slow 8s ease-in-out infinite;
+  z-index: -5;
+}
+
+.bg-orb-1 {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  top: 10%;
+  left: 60%; /* Move to the right side, away from sidebar */
+  animation-delay: 0s;
+}
+
+.bg-orb-2 {
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  top: 60%;
+  right: 15%;
+  animation-delay: -2s;
+}
+
+.bg-orb-3 {
+  width: 250px;
+  height: 250px;
+  background: linear-gradient(135deg, var(--secondary), var(--accent));
+  bottom: 20%;
+  left: 70%; /* Move to the right side, away from sidebar */
+  animation-delay: -4s;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .empty-state-title {
+    font-size: 2.2rem;
+  }
+  
+  .empty-state-description {
+    font-size: 1rem;
+  }
+  
+  .empty-state-btn {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: 1rem;
+  }
+  
+  .music-note-icon svg {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .wave {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .bg-orb-1 {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .bg-orb-2 {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .bg-orb-3 {
+    width: 180px;
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .empty-studio-state {
+    padding: var(--spacing-lg);
+  }
+  
+  .empty-state-title {
+    font-size: 1.8rem;
+  }
+  
+  .empty-state-content {
+    gap: var(--spacing-lg);
+  }
+}

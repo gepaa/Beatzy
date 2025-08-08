@@ -6,13 +6,14 @@ interface SidebarProps {
   currentView: View;
   onViewChange: (view: View) => void;
   isOpen: boolean;
+  isUniversalMode?: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, isOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, isOpen, isUniversalMode = false }) => {
   const navigationItems = [
     { 
       id: 'studio' as View, 
-      label: 'Create Beat', 
+      label: 'Studio', 
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M9 18V5l12-2v13"/>
@@ -57,9 +58,45 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, isOpen }) 
     { name: 'Future Bass Drop', type: 'Electronic', modified: '1 week ago', progress: 90 }
   ];
 
+  const handleToggleSidebar = () => {
+    const event = new CustomEvent('toggleSidebar');
+    window.dispatchEvent(event);
+  };
+
   return (
-    <aside className={`sidebar ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+    <aside className={`sidebar ${isOpen ? 'sidebar-open' : 'sidebar-closed'} ${isUniversalMode ? 'sidebar-universal' : ''}`}>
       <div className="sidebar-content">
+        
+        {/* Sidebar Header with Toggle */}
+        <div className="sidebar-header">
+          <div className="sidebar-brand">
+            <div className="logo-icon">
+              <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="14" fill="url(#gradient1)"/>
+                <path d="M12 10v12l8-6z" fill="white"/>
+                <defs>
+                  <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#6366f1"/>
+                    <stop offset="100%" stopColor="#8b5cf6"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <span className="sidebar-brand-text">Beatzy</span>
+          </div>
+          
+          <button 
+            className="btn btn-ghost btn-icon sidebar-toggle"
+            onClick={handleToggleSidebar}
+            aria-label="Toggle sidebar"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        </div>
         
         {/* Navigation */}
         <nav className="sidebar-nav">
@@ -131,22 +168,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, isOpen }) 
           </div>
         </div>
 
-        {/* AI Assistant */}
-        <div className="sidebar-section ai-assistant">
-          <div className="ai-card glass-card">
-            <div className="ai-avatar">
-              <div className="ai-pulse"></div>
-              🤖
-            </div>
-            <div className="ai-content">
-              <h4 className="ai-title">AI Beat Assistant</h4>
-              <p className="ai-description">Ready to help you create amazing beats!</p>
-              <button className="btn btn-accent btn-sm">
-                Start Creating
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* Stats */}
         <div className="sidebar-footer">
@@ -168,16 +189,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, isOpen }) 
 
       </div>
 
-      {/* Audio Waveform Animation */}
-      <div className="sidebar-waveform">
-        {[...Array(5)].map((_, i) => (
-          <div 
-            key={i} 
-            className="wave-line"
-            style={{ animationDelay: `${i * 0.2}s` }}
-          />
-        ))}
-      </div>
     </aside>
   );
 };

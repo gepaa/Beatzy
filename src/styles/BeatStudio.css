@@ -1,89 +1,115 @@
-/* Create Beat Prompt */
-.create-beat-prompt {
+/* Import Modal Styles */
+.import-modal {
+  max-width: 600px;
+  width: 90vw;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-xl);
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
   background: var(--bg-card);
   border: 1px solid var(--border-primary);
   border-radius: var(--border-radius-lg);
-  text-align: center;
-  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.3s ease-out;
 }
 
-.prompt-icon {
-  font-size: 3rem;
-  margin-bottom: var(--spacing-sm);
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-primary);
 }
 
-.prompt-description {
-  font-size: 1rem;
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
   color: var(--text-secondary);
-  line-height: 1.6;
-  margin: 0 0 var(--spacing-lg) 0;
-  max-width: 400px;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+  transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+  background: var(--bg-glass);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .beat-studio {
-  height: calc(100vh - var(--header-height));
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg-primary);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
-.studio-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg) 0;
-  border-bottom: 1px solid var(--border-primary);
-  margin-bottom: var(--spacing-lg);
+.main-content-fixed.without-sidebar .beat-studio {
+  padding-left: 0;
 }
 
-.project-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
+.main-content-fixed.without-sidebar .studio-header {
+  padding-left: 0;
 }
 
-.project-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  background: linear-gradient(135deg, var(--text-primary), var(--primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.main-content-fixed.without-sidebar .project-title {
+  margin-left: 0;
 }
 
-.project-details {
-  display: flex;
-  gap: var(--spacing-lg);
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
 
-.tempo {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.key {
-  color: var(--primary);
-  font-weight: 500;
-}
-
-.genre {
-  color: var(--text-muted);
-}
-
-.studio-actions {
+/* Studio Actions Bar */
+.studio-actions-bar {
   display: flex;
   gap: var(--spacing-md);
   align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-primary);
+  border-top: 1px solid var(--border-primary);
 }
 
 .btn.active {
@@ -98,7 +124,18 @@
   display: grid;
   grid-template-columns: 320px 1fr 280px;
   gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
   min-height: 0;
+  max-height: calc(100vh - 180px);
+}
+
+/* Dynamic layout based on panels */
+.studio-workspace:not(.has-sidebar) {
+  grid-template-columns: 1fr 280px;
+}
+
+.studio-workspace.has-sidebar {
+  grid-template-columns: 320px 1fr 280px;
 }
 
 .studio-sidebar {
@@ -114,6 +151,7 @@
   gap: var(--spacing-lg);
   min-height: 0;
 }
+
 
 .studio-tracks {
   overflow-y: auto;
@@ -158,64 +196,47 @@
   overflow: hidden;
 }
 
-.controls-section {
-  background: var(--bg-card);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  backdrop-filter: blur(10px);
+.timeline-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 450px;
+  position: relative;
 }
 
-/* Floating Action Button */
-.fab {
-  position: fixed;
-  bottom: var(--spacing-xl);
-  right: var(--spacing-xl);
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  border: none;
-  color: white;
-  cursor: pointer;
-  box-shadow: var(--shadow-lg);
-  transition: all var(--transition-medium);
-  z-index: 100;
+.transport-section {
+  background: transparent;
+  padding: var(--spacing-md) 0;
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 
-.fab:hover {
-  transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
-}
-
-.fab:active {
-  transform: scale(0.95) rotate(90deg);
-}
 
 /* Mobile Responsive */
 @media (max-width: 1200px) {
   .studio-workspace {
     grid-template-columns: 280px 1fr 240px;
   }
+  
+  .studio-workspace:not(.has-sidebar) {
+    grid-template-columns: 1fr 240px;
+  }
+  
+  .studio-workspace.has-sidebar {
+    grid-template-columns: 280px 1fr 240px;
+  }
 }
 
 @media (max-width: 768px) {
-  .studio-header {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    align-items: flex-start;
-  }
-  
-  .studio-actions {
-    width: 100%;
-    justify-content: space-between;
+  .studio-actions-bar {
+    padding: var(--spacing-sm) var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
   }
   
   .studio-workspace {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     grid-template-rows: auto 1fr auto;
   }
   
@@ -233,11 +254,9 @@
     max-height: 200px;
   }
   
-  .fab {
-    bottom: var(--spacing-lg);
-    right: var(--spacing-lg);
-    width: 50px;
-    height: 50px;
+  .import-modal {
+    width: 95vw;
+    margin: var(--spacing-lg);
   }
 }
 
@@ -253,22 +272,19 @@
   }
 }
 
-.upload-section,
 .visualizer-section,
-.controls-section {
+.timeline-section,
+.transport-section {
   animation: slideInUp 0.6s ease-out;
 }
 
-.upload-section {
+.visualizer-section,
+.timeline-section {
   animation-delay: 0.1s;
 }
 
-.visualizer-section {
+.transport-section {
   animation-delay: 0.2s;
-}
-
-.controls-section {
-  animation-delay: 0.3s;
 }
 
 /* Glow effects for active elements */

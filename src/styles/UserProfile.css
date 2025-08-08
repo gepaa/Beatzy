@@ -1,8 +1,15 @@
 .user-profile {
-  height: calc(100vh - var(--header-height));
+  height: 100vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  box-sizing: border-box;
+}
+
+.main-content-fixed.without-sidebar .user-profile {
+  padding-left: 0;
 }
 
 /* Profile Header */

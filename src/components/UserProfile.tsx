@@ -2,6 +2,7 @@ import React from 'react';
 import '../styles/UserProfile.css';
 
 const UserProfile: React.FC = () => {
+
   const user = {
     name: 'Alex Producer',
     username: '@alexbeats',

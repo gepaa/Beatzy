@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import HomePage from './components/HomePage';
@@ -16,6 +16,14 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [, setIsAuthenticated] = useState(false);
+  const [shouldCreateBeat, setShouldCreateBeat] = useState(false);
+
+  // Listen for sidebar toggle events from studio page
+  React.useEffect(() => {
+    const handleToggleSidebar = () => setSidebarOpen(prev => !prev);
+    window.addEventListener('toggleSidebar', handleToggleSidebar);
+    return () => window.removeEventListener('toggleSidebar', handleToggleSidebar);
+  }, []);
 
   const handleGetStarted = () => {
     setIsAuthenticated(true);
@@ -43,6 +51,7 @@ function App() {
 
   const handleChooseManual = () => {
     setShowCreateModal(false);
+    setShouldCreateBeat(true);
     setCurrentView('studio');
   };
 
@@ -51,7 +60,13 @@ function App() {
       case 'home':
         return <HomePage onGetStarted={handleGetStarted} />;
       case 'studio':
-        return <BeatStudio onCreateBeat={handleCreateBeat} />;
+        return (
+          <BeatStudio 
+            onCreateBeat={handleCreateBeat} 
+            shouldCreateBeat={shouldCreateBeat}
+            onBeatCreated={() => setShouldCreateBeat(false)}
+          />
+        );
       case 'projects':
         return <ProjectDashboard />;
       case 'profile':
@@ -75,26 +90,46 @@ function App() {
 
   return (
     <div className="app">
-      <Header 
-        onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
-        sidebarOpen={sidebarOpen}
-        isHomePage={isHomePage}
-        onLogin={handleLogin}
-        onSignUp={handleSignUp}
-      />
+      {isHomePage && (
+        <Header 
+          onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+          sidebarOpen={sidebarOpen}
+          isHomePage={isHomePage}
+          onLogin={handleLogin}
+          onSignUp={handleSignUp}
+        />
+      )}
       
       {!isHomePage && (
-        <div className="app-layout">
+        <>
           <Sidebar 
             currentView={currentView}
             onViewChange={setCurrentView}
             isOpen={sidebarOpen}
+            isUniversalMode={true}
           />
           
-          <main className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-            {renderCurrentView()}
+          <main className={`main-content-fixed ${sidebarOpen ? 'with-sidebar' : 'without-sidebar'}`}>
+            <div className="content-container">
+              {renderCurrentView()}
+            </div>
           </main>
-        </div>
+
+          {/* Floating Menu Button - Only show when sidebar is closed */}
+          {!sidebarOpen && (
+            <button 
+              className="floating-menu-btn"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
+          )}
+        </>
       )}
       
       {isHomePage && renderCurrentView()}
